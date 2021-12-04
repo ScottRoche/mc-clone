@@ -1,8 +1,10 @@
 spirit_includes = []
 spirit_includes += include_directories('../../subprojects/glm')
 
-spirit_source = ['main.cpp',
-                 'log.cpp']
+subdir('core')
+
+spirit_source = ['main.cpp']
+spirit_source += core_source
 
 glfw = dependency('glfw3')
 glad = subproject('glad').get_variable('glad_dep')
