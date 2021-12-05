@@ -17,12 +17,14 @@ namespace Spirit
 			}
 		}
 
+		m_Data = data;
+
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-		m_Window = glfwCreateWindow(data.Width,
-		                            data.Height,
-		                            data.Title.c_str(),
+		m_Window = glfwCreateWindow(m_Data.Width,
+		                            m_Data.Height,
+		                            m_Data.Title.c_str(),
 		                            NULL,
 		                            NULL);
 
@@ -40,7 +42,6 @@ namespace Spirit
 			return;
 		}
 
-		m_Data = data;
 		s_WindowCount++;
 	}
 
