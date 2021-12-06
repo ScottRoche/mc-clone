@@ -1,1 +1,2 @@
-renderer_source = files('renderer.cpp')
+renderer_source = files('renderer.cpp',
+                        'shader.cpp')
