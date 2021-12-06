@@ -12,6 +12,8 @@ namespace Spirit
 		void Bind();
 		void Unbind();
 
+		unsigned int GetShaderId() const { return m_ShaderId; }
+
 	private:
 		std::string ReadFile(const std::string& filepath);
 		void CompileShader(const std::string& vertexSource, const std::string& fragmentSource);
