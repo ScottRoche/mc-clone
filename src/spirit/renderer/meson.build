@@ -1,2 +1,3 @@
 renderer_source = files('renderer.cpp',
-                        'shader.cpp')
+                        'shader.cpp',
+                        'buffer.cpp')

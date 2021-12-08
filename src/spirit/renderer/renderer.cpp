@@ -1,6 +1,7 @@
 #include "renderer.h"
 
 #include <string>
+#include <memory>
 
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
@@ -11,6 +12,7 @@
 
 #include "core/log.h"
 
+#include "buffer.h"
 #include "shader.h"
 
 namespace Spirit
@@ -21,6 +23,8 @@ namespace Spirit
 
 	static float windowWidth = 800.0f;  // Only doing this temporarily I know the size
 	static float windowHeight = 600.0f; // Only doing this temporarily I know the size
+
+	static VertexBuffer* vertexBuffer;
 
 	void RendererInit()
 	{
@@ -44,7 +48,7 @@ namespace Spirit
 			 0.5f, -0.5f,  0.5f, 0.0f, 1.0f, 0.0f,  // front-right
 			 0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, // back-right
 
-			// Front
+			// Back
 			-0.5f,  0.5f, -0.5f, 1.0f, 0.0f, 0.0f, // top-left
 			-0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, // bottom-left
 			 0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, // bottom-right
@@ -62,10 +66,11 @@ namespace Spirit
 			-0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, // bottom-right
 			-0.5f,  0.5f, -0.5f, 0.0f, 0.0f, 1.0f,  // top-right
 		};
-		
+
 		unsigned int indicies[] = {
+			//0, 1, 2, 0, 1, 3,
 			0, 1, 2,
-			3, 0, 2,
+			2, 0, 3,
 
 			4, 5, 6,
 			6, 7, 5,
@@ -88,11 +93,8 @@ namespace Spirit
 		glBindVertexArray(vertexArray);
 
 		// Create vertex buffer
-		unsigned int vertexBuffer;
-		glGenBuffers(1, &vertexBuffer);
-		glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(verticies), verticies, GL_STATIC_DRAW);
-		
+		vertexBuffer = new VertexBuffer(sizeof(verticies), verticies);
+
 		// Vertex attribs
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (void*)0);
 		glEnableVertexAttribArray(0);
@@ -101,10 +103,7 @@ namespace Spirit
 		glEnableVertexAttribArray(1);
 
 		// Create index buffer
-		unsigned int indexBuffer;
-		glGenBuffers(2, &indexBuffer);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indicies), indicies, GL_STATIC_DRAW);
+		IndexBuffer indexBuffer(sizeof(indicies), indicies);
 
 		// File paths like this aren't good. Only for temporary testing.
 		Shader shader("./shaders/vertex.glsl", "./shaders/fragment.glsl");
@@ -152,6 +151,6 @@ namespace Spirit
 
 
 		glBindVertexArray(vertexArray);
-		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, 40, GL_UNSIGNED_INT, 0);
 	}
 }
