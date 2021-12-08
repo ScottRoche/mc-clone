@@ -26,15 +26,61 @@ namespace Spirit
 	{
 
 		float verticies[] = {
-			-0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // top-left
-			-0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // bottom-left
-			 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom-right
-			 0.5f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f  // top-right
+			// Front
+			-0.5f,  0.5f,  0.5f, 1.0f, 0.0f, 0.0f, // top-left
+			-0.5f, -0.5f,  0.5f, 1.0f, 0.0f, 0.0f, // bottom-left
+			 0.5f, -0.5f,  0.5f, 1.0f, 0.0f, 0.0f, // bottom-right
+			 0.5f,  0.5f,  0.5f, 1.0f, 0.0f, 0.0f,  // top-right
+
+			// Top
+			-0.5f,  0.5f,  0.5f, 0.0f, 1.0f, 0.0f, // front-left
+			-0.5f,  0.5f, -0.5f, 0.0f, 1.0f, 0.0f, // back-left
+			 0.5f,  0.5f,  0.5f, 0.0f, 1.0f, 0.0f,  // front-right
+			 0.5f,  0.5f, -0.5f, 0.0f, 1.0f, 0.0f, // back-right
+			
+			// Bottom
+			-0.5f, -0.5f,  0.5f, 0.0f, 1.0f, 0.0f, // front-left
+			-0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, // back-left
+			 0.5f, -0.5f,  0.5f, 0.0f, 1.0f, 0.0f,  // front-right
+			 0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, // back-right
+
+			// Front
+			-0.5f,  0.5f, -0.5f, 1.0f, 0.0f, 0.0f, // top-left
+			-0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, // bottom-left
+			 0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, // bottom-right
+			 0.5f,  0.5f, -0.5f, 1.0f, 0.0f, 0.0f,  // top-right
+
+			// Right
+			 0.5f,  0.5f,  0.5f, 0.0f, 0.0f, 1.0f, // top-left
+			 0.5f, -0.5f,  0.5f, 0.0f, 0.0f, 1.0f, // bottom-left
+			 0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, // bottom-right
+			 0.5f,  0.5f, -0.5f, 0.0f, 0.0f, 1.0f,  // top-right
+
+			// Left
+			-0.5f,  0.5f,  0.5f, 0.0f, 0.0f, 1.0f, // top-left
+			-0.5f, -0.5f,  0.5f, 0.0f, 0.0f, 1.0f, // bottom-left
+			-0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, // bottom-right
+			-0.5f,  0.5f, -0.5f, 0.0f, 0.0f, 1.0f,  // top-right
 		};
 		
 		unsigned int indicies[] = {
 			0, 1, 2,
-			3, 0, 2
+			3, 0, 2,
+
+			4, 5, 6,
+			6, 7, 5,
+
+			8, 9, 10,
+			10, 11, 9,
+
+			12, 13, 14,
+			15, 12, 14,
+
+			16, 17, 18,
+			19, 16, 18,
+
+			20, 21, 22,
+			23, 20, 22
 		};
 
 		// Generate vertex attrib array
@@ -58,7 +104,7 @@ namespace Spirit
 		unsigned int indexBuffer;
 		glGenBuffers(2, &indexBuffer);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * 6, indicies, GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indicies), indicies, GL_STATIC_DRAW);
 
 		// File paths like this aren't good. Only for temporary testing.
 		Shader shader("./shaders/vertex.glsl", "./shaders/fragment.glsl");
@@ -81,6 +127,7 @@ namespace Spirit
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
 
+		glEnable(GL_DEPTH_TEST);
 		LOG_INFO("Renderer Initalised");
 	}
 
@@ -92,10 +139,12 @@ namespace Spirit
 
 	void Draw()
 	{
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glEnable(GL_DEPTH_TEST);
 
 		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::rotate(model,
-		                    (float)glfwGetTime() * glm::radians(-10.0f),
+		                    (float)glfwGetTime() * glm::radians(-20.0f),
 		                    glm::vec3(1.0f, 1.0f, 0.0f));
 
 		int modelLoc = glGetUniformLocation(shaderId, "model");
@@ -103,6 +152,6 @@ namespace Spirit
 
 
 		glBindVertexArray(vertexArray);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 	}
 }

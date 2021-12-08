@@ -17,8 +17,6 @@ int main(int argc, char *argv[])
 	 * window should tell the application in a callback that it has closed. */
 	while (!glfwWindowShouldClose(window.GetWindowHandle()))
 	{
-		glClear(GL_COLOR_BUFFER_BIT);
-
 		Spirit::Draw();
 		window.OnUpdate();
 	}
