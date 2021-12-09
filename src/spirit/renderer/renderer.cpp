@@ -14,17 +14,16 @@
 
 #include "buffer.h"
 #include "shader.h"
+#include "vertex_array.h"
 
 namespace Spirit
 {
-	static unsigned int vertexArray;
+	static VertexArray* vertexArray;
 
 	static unsigned int shaderId;
 
 	static float windowWidth = 800.0f;  // Only doing this temporarily I know the size
 	static float windowHeight = 600.0f; // Only doing this temporarily I know the size
-
-	static VertexBuffer* vertexBuffer;
 
 	void RendererInit()
 	{
@@ -89,18 +88,17 @@ namespace Spirit
 		};
 
 		// Generate vertex attrib array
-		glGenVertexArrays(1, &vertexArray);
-		glBindVertexArray(vertexArray);
+		vertexArray = new VertexArray();
+		vertexArray->Bind();
 
 		// Create vertex buffer
-		vertexBuffer = new VertexBuffer(sizeof(verticies), verticies);
+		VertexBuffer vertexBuffer(sizeof(verticies), verticies);
+		vertexBuffer.SetLayout({
+			{3, ElementType::Float, false, (void*)0},
+			{3, ElementType::Float, false, (void*)(3 * 4)}
+		});
 
-		// Vertex attribs
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (void*)0);
-		glEnableVertexAttribArray(0);
-
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (void*)(sizeof(float) * 3));
-		glEnableVertexAttribArray(1);
+		vertexArray->AddVertexBuffer(vertexBuffer); // Vertex attributes
 
 		// Create index buffer
 		IndexBuffer indexBuffer(sizeof(indicies), indicies);
@@ -123,8 +121,8 @@ namespace Spirit
 		int viewLoc = glGetUniformLocation(shaderId, "view");
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glBindVertexArray(0);
+		vertexBuffer.Unbind();
+		vertexArray->Unbind();
 
 		glEnable(GL_DEPTH_TEST);
 		LOG_INFO("Renderer Initalised");
@@ -132,6 +130,7 @@ namespace Spirit
 
 	void RendererDeinit()
 	{
+		delete vertexArray;
 		glBindVertexArray(0);
 		LOG_INFO("Renderer Deinitalised");
 	}
@@ -149,8 +148,7 @@ namespace Spirit
 		int modelLoc = glGetUniformLocation(shaderId, "model");
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
-
-		glBindVertexArray(vertexArray);
-		glDrawElements(GL_TRIANGLES, 40, GL_UNSIGNED_INT, 0);
+		vertexArray->Bind();
+		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 	}
 }
