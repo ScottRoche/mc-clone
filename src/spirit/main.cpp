@@ -12,15 +12,15 @@ int main(int argc, char *argv[])
 
 	Spirit::Window window(Spirit::WindowProps("Minecraft Clone"));
 
-	Spirit::RendererInit();
+	Spirit::Renderer::Init();
 	/* This is only temporary. There should be no GetWindowHandle and telling the
 	 * window should tell the application in a callback that it has closed. */
 	while (!glfwWindowShouldClose(window.GetWindowHandle()))
 	{
-		Spirit::Draw();
 		window.OnUpdate();
+		Spirit::Renderer::Draw();
 	}
 
-	Spirit::RendererDeinit();
+	Spirit::Renderer::Deinit();
 	return 0;
 }

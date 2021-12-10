@@ -61,11 +61,11 @@ namespace Spirit
  * Index Buffer
 *****************************************************************************/
 
-	IndexBuffer::IndexBuffer(uint32_t size, uint32_t* verticies)
+	IndexBuffer::IndexBuffer(uint32_t size, uint32_t* indicies)
 	{
 		glGenBuffers(1, &m_BufferId);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_BufferId);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, verticies, GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, indicies, GL_STATIC_DRAW);
 	}
 
 	IndexBuffer::~IndexBuffer()

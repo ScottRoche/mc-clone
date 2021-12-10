@@ -16,19 +16,7 @@
 #include "shader.h"
 #include "vertex_array.h"
 
-namespace Spirit
-{
-	static VertexArray* vertexArray;
-
-	static unsigned int shaderId;
-
-	static float windowWidth = 800.0f;  // Only doing this temporarily I know the size
-	static float windowHeight = 600.0f; // Only doing this temporarily I know the size
-
-	void RendererInit()
-	{
-
-		float verticies[] = {
+static float s_SampleVerts[] = {
 			// Front
 			-0.5f,  0.5f,  0.5f, 1.0f, 0.0f, 0.0f, // top-left
 			-0.5f, -0.5f,  0.5f, 1.0f, 0.0f, 0.0f, // bottom-left
@@ -66,7 +54,7 @@ namespace Spirit
 			-0.5f,  0.5f, -0.5f, 0.0f, 0.0f, 1.0f,  // top-right
 		};
 
-		unsigned int indicies[] = {
+static unsigned int s_SampleIndicies[] = {
 			//0, 1, 2, 0, 1, 3,
 			0, 1, 2,
 			2, 0, 3,
@@ -87,25 +75,39 @@ namespace Spirit
 			23, 20, 22
 		};
 
-		// Generate vertex attrib array
-		vertexArray = new VertexArray();
-		vertexArray->Bind();
+namespace Spirit
+{
+	struct RendererData
+	{
+		std::shared_ptr<VertexArray> RendererVertexArray;
+		std::shared_ptr<VertexBuffer> RendererVertexBuffer;
+		std::shared_ptr<Shader> RendererShader;
+	};
 
-		// Create vertex buffer
-		VertexBuffer vertexBuffer(sizeof(verticies), verticies);
-		vertexBuffer.SetLayout({
+	static float windowWidth = 800.0f;  // Only doing this temporarily I know the size
+	static float windowHeight = 600.0f; // Only doing this temporarily I know the size
+
+	static RendererData s_Data;
+
+	void Renderer::Init()
+	{
+		s_Data.RendererVertexArray = std::make_shared<VertexArray>();
+		s_Data.RendererVertexArray->Bind();
+
+		s_Data.RendererVertexBuffer = std::make_shared<VertexBuffer>(sizeof(s_SampleVerts), s_SampleVerts);
+		s_Data.RendererVertexBuffer->SetLayout({
 			{3, ElementType::Float, false, (void*)0},
 			{3, ElementType::Float, false, (void*)(3 * 4)}
 		});
+		s_Data.RendererVertexArray->AddVertexBuffer(s_Data.RendererVertexBuffer);
 
-		vertexArray->AddVertexBuffer(vertexBuffer); // Vertex attributes
+		std::shared_ptr<IndexBuffer> indexBuffer = std::make_shared<IndexBuffer>(sizeof(s_SampleIndicies), s_SampleIndicies);
+		s_Data.RendererVertexArray->SetIndexBuffer(indexBuffer);
 
-		// Create index buffer
-		IndexBuffer indexBuffer(sizeof(indicies), indicies);
+		s_Data.RendererShader = std::make_shared<Shader>("./shaders/vertex.glsl", "./shaders/fragment.glsl");
 
-		// File paths like this aren't good. Only for temporary testing.
-		Shader shader("./shaders/vertex.glsl", "./shaders/fragment.glsl");
-		shaderId = shader.GetShaderId();
+		glEnable(GL_DEPTH_TEST);
+		LOG_INFO("Renderer Initalised");
 
 		glm::mat4 projection = glm::perspective(glm::radians(45.0f),
 		                                        windowWidth / windowHeight,
@@ -115,27 +117,23 @@ namespace Spirit
 		glm::mat4 view = glm::mat4(1.0f);
 		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
 
-		int projLoc = glGetUniformLocation(shaderId, "proj");
+		int projLoc = glGetUniformLocation(s_Data.RendererShader->GetShaderId(), "proj");
 		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
-		int viewLoc = glGetUniformLocation(shaderId, "view");
+		int viewLoc = glGetUniformLocation(s_Data.RendererShader->GetShaderId(), "view");
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-
-		vertexBuffer.Unbind();
-		vertexArray->Unbind();
-
-		glEnable(GL_DEPTH_TEST);
-		LOG_INFO("Renderer Initalised");
 	}
 
-	void RendererDeinit()
+	void Renderer::Deinit()
 	{
-		delete vertexArray;
-		glBindVertexArray(0);
+		s_Data.RendererShader->Unbind();
+		s_Data.RendererVertexBuffer->Unbind();
+		s_Data.RendererVertexArray->Unbind();
+
 		LOG_INFO("Renderer Deinitalised");
 	}
 
-	void Draw()
+	void Renderer::Draw()
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glEnable(GL_DEPTH_TEST);
@@ -145,10 +143,57 @@ namespace Spirit
 		                    (float)glfwGetTime() * glm::radians(-20.0f),
 		                    glm::vec3(1.0f, 1.0f, 0.0f));
 
-		int modelLoc = glGetUniformLocation(shaderId, "model");
+		int modelLoc = glGetUniformLocation(s_Data.RendererShader->GetShaderId(), "model");
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
-		vertexArray->Bind();
 		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 	}
+
+	// void RendererInit()
+	// {
+
+	// 	// Generate vertex attrib array
+	// 	vertexArray = new VertexArray();
+	// 	vertexArray->Bind();
+
+	// 	// Create vertex buffer
+	// 	VertexBuffer vertexBuffer(sizeof(verticies), verticies);
+	// 	vertexBuffer.SetLayout({
+	// 		{3, ElementType::Float, false, (void*)0},
+	// 		{3, ElementType::Float, false, (void*)(3 * 4)}
+	// 	});
+
+	// 	vertexArray->AddVertexBuffer(vertexBuffer); // Vertex attributes
+
+	// 	// Create index buffer
+	// 	IndexBuffer indexBuffer(sizeof(s_SampleIndicies), s_SampleIndicies);
+
+	// 	// File paths like this aren't good. Only for temporary testing.
+	// 	Shader shader("./shaders/vertex.glsl", "./shaders/fragment.glsl");
+	// 	shaderId = shader.GetShaderId();
+
+	// 	glm::mat4 projection = glm::perspective(glm::radians(45.0f),
+	// 	                                        windowWidth / windowHeight,
+	// 	                                        0.1f,
+	// 	                                        100.0f);
+
+	// 	glm::mat4 view = glm::mat4(1.0f);
+	// 	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+
+	// 	int projLoc = glGetUniformLocation(shaderId, "proj");
+	// 	glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
+
+	// 	int viewLoc = glGetUniformLocation(shaderId, "view");
+	// 	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+
+	// 	vertexBuffer.Unbind();
+	// 	vertexArray->Unbind();
+	// }
+
+	// void RendererDeinit()
+	// {
+	// 	delete vertexArray;
+	// 	glBindVertexArray(0);
+	// 	LOG_INFO("Renderer Deinitalised");
+	// }
 }

@@ -2,9 +2,14 @@
 
 namespace Spirit
 {
-	void RendererInit();
-	void RendererDeinit();
+	class Renderer
+	{
+	public:
+		static void Init();
+		static void Deinit();
 
-	/* Temporary Draw */
-	void Draw();
+		static void Draw();
+
+	private:
+	};
 }

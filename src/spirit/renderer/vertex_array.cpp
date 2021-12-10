@@ -34,9 +34,12 @@ namespace Spirit
 		glBindVertexArray(0);
 	}
 
-	void VertexArray::AddVertexBuffer(VertexBuffer& vertexBuffer)
+	void VertexArray::AddVertexBuffer(std::shared_ptr<VertexBuffer>& vertexBuffer)
 	{
-		BufferLayout& bufferLayout = vertexBuffer.GetLayout();
+		glBindVertexArray(m_Array);
+		vertexBuffer->Bind();
+
+		BufferLayout& bufferLayout = vertexBuffer->GetLayout();
 		for (BufferElement element : bufferLayout.GetElements())
 		{
 			glVertexAttribPointer(m_AttributeCount,
@@ -48,5 +51,15 @@ namespace Spirit
 			glEnableVertexAttribArray(m_AttributeCount);
 			m_AttributeCount++;
 		}
+
+		m_VertexBuffer = vertexBuffer;
+	}
+
+	void VertexArray::SetIndexBuffer(std::shared_ptr<IndexBuffer>& indexBuffer)
+	{
+		glBindVertexArray(m_Array);
+		indexBuffer->Bind();
+
+		m_IndexBuffer = indexBuffer;
 	}
 }
