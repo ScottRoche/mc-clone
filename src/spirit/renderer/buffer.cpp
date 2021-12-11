@@ -9,7 +9,14 @@ namespace Spirit
  * Vertex Buffer
 *****************************************************************************/
 
-	VertexBuffer::VertexBuffer(uint32_t size, float* verticies)
+	VertexBuffer::VertexBuffer(uint32_t size)
+	{
+		glGenBuffers(1, &m_BufferId);
+		glBindBuffer(GL_ARRAY_BUFFER, m_BufferId);
+		glBufferData(GL_ARRAY_BUFFER, size, nullptr, GL_DYNAMIC_DRAW);
+	}
+
+	VertexBuffer::VertexBuffer(float* verticies, uint32_t size)
 	{
 		glGenBuffers(1, &m_BufferId);
 		glBindBuffer(GL_ARRAY_BUFFER, m_BufferId);
@@ -55,6 +62,13 @@ namespace Spirit
 			          (unsigned int)(uintptr_t)element.Offset);
 		}
 		#undef TO_STRING
+	}
+
+	void VertexBuffer::AddData(float* vertexData, uint32_t size)
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, m_BufferId);
+		glBufferSubData(GL_ARRAY_BUFFER, m_BufferEnd, size, vertexData);
+		m_BufferEnd += size;
 	}
 
 /*****************************************************************************

@@ -1,7 +1,5 @@
 #pragma once
 
-#include <memory>
-
 #include "buffer.h"
 
 namespace Spirit
@@ -15,14 +13,12 @@ namespace Spirit
 		void Bind();
 		void Unbind();
 
-		void AddVertexBuffer(std::shared_ptr<VertexBuffer>& vertexBuffer);
-		void SetIndexBuffer(std::shared_ptr<IndexBuffer>& indexBuffer);
+		void AddVertexBuffer(VertexBuffer* vertexBuffer);
 
 	private:
 		unsigned int m_Array;
-		unsigned int m_AttributeCount;
+		unsigned int m_AttributeIndex;
 
-		std::shared_ptr<VertexBuffer> m_VertexBuffer;
-		std::shared_ptr<IndexBuffer> m_IndexBuffer;
+		VertexBuffer* m_VertexBuffer;
 	};
 }

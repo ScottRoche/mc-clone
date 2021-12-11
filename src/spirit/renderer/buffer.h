@@ -45,7 +45,8 @@ namespace Spirit
 	class VertexBuffer
 	{
 	public:
-		VertexBuffer(uint32_t size, float* verticies);
+		VertexBuffer(uint32_t size);
+		VertexBuffer(float* verticies, uint32_t size);
 		~VertexBuffer();
 
 		void Bind();
@@ -55,8 +56,12 @@ namespace Spirit
 	
 		BufferLayout& GetLayout() { return m_Layout; }
 
+		void AddData(float* vertexData, uint32_t size);
+
 	private:
 		unsigned int m_BufferId;
+		unsigned int m_BufferEnd = 0;
+
 		BufferLayout m_Layout;
 	};
 
