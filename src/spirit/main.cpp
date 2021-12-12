@@ -53,18 +53,41 @@ int main(int argc, char *argv[])
 
 	Spirit::Window window(Spirit::WindowProps("Minecraft Clone"));
 	Spirit::Camera camera(45.0f, glm::vec2(800.0f, 600.0f), 0.1f, 100.0f);
-	camera.SetPosition(glm::vec3(0.0f, 0.0f, -3.0f));
+	camera.SetPosition(glm::vec3(0.0f, 0.0f, -20.0f));
 	camera.SetYaw(20.0f);
 
-	Spirit::Renderer::Init(camera);
+	Spirit::Renderer::Init();
 	/* This is only temporary. There should be no GetWindowHandle and telling the
 	 * window should tell the application in a callback that it has closed. */
 	while (!glfwWindowShouldClose(window.GetWindowHandle()))
 	{
-		Spirit::Renderer::Submit(s_SampleVerts, sizeof(s_SampleVerts));
+		static float lastFrameTs = 0;
+
+		float ts = glfwGetTime();
+		float deltaTime = ts - lastFrameTs;
+		lastFrameTs = ts;
+
+		float s_EditVerts[sizeof(s_SampleVerts)/sizeof(float)];
+		memcpy(s_EditVerts, s_SampleVerts, sizeof(s_SampleVerts));
 
 		window.OnUpdate();
-		Spirit::Renderer::Draw();
+
+		camera.SetYaw(200.0f * deltaTime);
+
+
+		Spirit::Renderer::BeginScene(camera);
+
+		Spirit::Renderer::Submit(s_SampleVerts, sizeof(s_SampleVerts));
+	
+		for (int i = 0; i < 2; i++)
+		{
+			for (int j = 0; j < sizeof(s_EditVerts) / sizeof(float); j += 6)
+			{
+				s_EditVerts[j] -= 2.0f;
+			}
+			Spirit::Renderer::Submit(s_EditVerts, sizeof(s_EditVerts));
+		}
+		Spirit::Renderer::EndScene();
 	}
 
 	Spirit::Renderer::Deinit();

@@ -28,6 +28,8 @@ namespace Spirit
 	{
 		static const unsigned int MaxVerts = 1024;
 
+		unsigned int VertexCount = 0;
+
 		VertexArray* RendererVertexArray;
 		VertexBuffer* RendererVertexBuffer;
 		Shader* RendererShader;
@@ -40,7 +42,7 @@ namespace Spirit
 
 	static RendererData s_Data;
 
-	void Renderer::Init(const Camera& camera)
+	void Renderer::Init()
 	{
 		s_Data.RendererVertexArray = new VertexArray();
 		s_Data.RendererVertexArray->Bind();
@@ -70,12 +72,6 @@ namespace Spirit
 		s_Data.RendererIndicies = new IndexBuffer((sizeof(float) * s_Data.MaxVerts) * 6, indicies);
 
 		s_Data.RendererShader = new Shader("./shaders/vertex.glsl", "./shaders/fragment.glsl");
-
-		int projLoc = glGetUniformLocation(s_Data.RendererShader->GetShaderId(), "proj");
-		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(camera.GetProjection()));
-
-		int viewLoc = glGetUniformLocation(s_Data.RendererShader->GetShaderId(), "view");
-		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(camera.GetView()));
 	}
 
 	void Renderer::Deinit()
@@ -85,9 +81,30 @@ namespace Spirit
 		delete s_Data.RendererShader;
 	}
 
+	void Renderer::BeginScene(const Camera& camera)
+	{
+		s_Data.RendererShader->Bind();
+
+		int projLoc = glGetUniformLocation(s_Data.RendererShader->GetShaderId(), "proj");
+		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(camera.GetProjection()));
+
+		int viewLoc = glGetUniformLocation(s_Data.RendererShader->GetShaderId(), "view");
+		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(camera.GetView()));
+	}
+
+	void Renderer::EndScene()
+	{
+		Flush();
+	}
+
 	void Renderer::Submit(float* meshData, uint32_t dataSize)
 	{
 		VertexData vertexData;
+
+		if (s_Data.VertexCount + dataSize / (sizeof(float) * 6) >= s_Data.MaxVerts)
+		{
+			Flush();
+		}
 
 		for (uint32_t i = 0; i < dataSize / sizeof(float); i += 6)
 		{
@@ -102,7 +119,17 @@ namespace Spirit
 			s_Data.RendererVertexData.push_back(vertexData);
 		}
 
-		s_Data.RendererVertexBuffer->AddData(meshData, dataSize);
+		s_Data.VertexCount += dataSize / (sizeof(float) * 6);
+	}
+
+	void Renderer::Flush()
+	{
+		s_Data.RendererVertexBuffer->AddData((float*)s_Data.RendererVertexData.data(),
+		                                     s_Data.RendererVertexData.size() * (sizeof(float) * 6));
+		Draw();
+
+		s_Data.RendererVertexData.clear();
+		s_Data.VertexCount = 0;
 	}
 
 	void Renderer::Draw()
@@ -122,7 +149,6 @@ namespace Spirit
 		s_Data.RendererVertexArray->Bind();
 
 		glDrawElements(GL_TRIANGLES, s_Data.MaxVerts, GL_UNSIGNED_INT, 0);
-
-		s_Data.RendererVertexData.clear();
 	}
+
 }
