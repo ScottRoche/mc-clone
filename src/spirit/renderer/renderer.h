@@ -17,6 +17,8 @@ namespace Spirit
 
 		static void Submit(float* meshData, uint32_t dataSize);
 
+		static void SetViewportSize(uint32_t width, uint32_t height);
+
 	private:
 		static void Flush();
 		static void Draw();

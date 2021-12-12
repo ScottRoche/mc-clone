@@ -122,6 +122,11 @@ namespace Spirit
 		s_Data.VertexCount += dataSize / (sizeof(float) * 6);
 	}
 
+	void Renderer::SetViewportSize(uint32_t width, uint32_t height)
+	{
+		glViewport(0, 0, width, height);
+	}
+
 	void Renderer::Flush()
 	{
 		s_Data.RendererVertexBuffer->AddData((float*)s_Data.RendererVertexData.data(),

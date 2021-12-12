@@ -1,24 +1,27 @@
 #pragma once
 
 #include <string>
+#include <functional>
 
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 
+#include "event.h"
 
 namespace Spirit
 {
+	using EventCallbackFn = std::function<void(Event&)>;
+
 	struct WindowProps
 	{
 		uint32_t Width, Height;
 		std::string Title;
+		EventCallbackFn EventCallback;
 
 		WindowProps(const std::string& title = "Spirit Window",
 		            uint32_t width = 800,
 		            uint32_t height = 600)
-			: Width(width), Height(height), Title(title)
-		{
-		}
+			: Width(width), Height(height), Title(title) {}
 	};
 
 	class Window
@@ -29,7 +32,7 @@ namespace Spirit
 
 		void OnUpdate();
 
-		inline GLFWwindow* GetWindowHandle() const { return m_Window; }
+		void SetEventCallback(const EventCallbackFn& callback) { m_Data.EventCallback = callback; }
 
 	private:
 		GLFWwindow* m_Window;
