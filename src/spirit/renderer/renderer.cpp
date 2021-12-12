@@ -40,7 +40,7 @@ namespace Spirit
 
 	static RendererData s_Data;
 
-	void Renderer::Init()
+	void Renderer::Init(const Camera& camera)
 	{
 		s_Data.RendererVertexArray = new VertexArray();
 		s_Data.RendererVertexArray->Bind();
@@ -71,19 +71,11 @@ namespace Spirit
 
 		s_Data.RendererShader = new Shader("./shaders/vertex.glsl", "./shaders/fragment.glsl");
 
-		glm::mat4 projection = glm::perspective(glm::radians(45.0f),
-		                                        windowWidth / windowHeight,
-		                                        0.1f,
-		                                        100.0f);
-
-		glm::mat4 view = glm::mat4(1.0f);
-		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
-
 		int projLoc = glGetUniformLocation(s_Data.RendererShader->GetShaderId(), "proj");
-		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
+		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(camera.GetProjection()));
 
 		int viewLoc = glGetUniformLocation(s_Data.RendererShader->GetShaderId(), "view");
-		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(camera.GetView()));
 	}
 
 	void Renderer::Deinit()
@@ -128,6 +120,7 @@ namespace Spirit
 
 		s_Data.RendererShader->Bind();
 		s_Data.RendererVertexArray->Bind();
+
 		glDrawElements(GL_TRIANGLES, s_Data.MaxVerts, GL_UNSIGNED_INT, 0);
 
 		s_Data.RendererVertexData.clear();

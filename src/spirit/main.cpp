@@ -1,9 +1,12 @@
 #include <iostream>
 
+#include <glm.hpp>
+
 #include "core/log.h"
 #include "core/window.h"
 
 #include "renderer/renderer.h"
+#include "renderer/camera.h"
 
 static float s_SampleVerts[] = {
 	// Front
@@ -49,8 +52,11 @@ int main(int argc, char *argv[])
 	LOG_INFO("Logger Initalised");
 
 	Spirit::Window window(Spirit::WindowProps("Minecraft Clone"));
+	Spirit::Camera camera(45.0f, glm::vec2(800.0f, 600.0f), 0.1f, 100.0f);
+	camera.SetPosition(glm::vec3(0.0f, 0.0f, -3.0f));
+	camera.SetYaw(20.0f);
 
-	Spirit::Renderer::Init();
+	Spirit::Renderer::Init(camera);
 	/* This is only temporary. There should be no GetWindowHandle and telling the
 	 * window should tell the application in a callback that it has closed. */
 	while (!glfwWindowShouldClose(window.GetWindowHandle()))
