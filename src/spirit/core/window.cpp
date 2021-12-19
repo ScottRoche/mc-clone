@@ -69,7 +69,8 @@ namespace Spirit
 
 			switch(action)
 			{
-				case GLFW_PRESS: 
+				case GLFW_REPEAT:
+				case GLFW_PRESS:
 				{
 					KeyPressedEvent keyPressedEvent(key);
 					data.EventCallback(keyPressedEvent);
@@ -81,7 +82,6 @@ namespace Spirit
 					data.EventCallback(keyReleasedEvent);
 					break;
 				}
-				case GLFW_REPEAT: break; // Not supported.
 			}
 		});
 
@@ -93,6 +93,7 @@ namespace Spirit
 
 			switch(action)
 			{
+				case GLFW_REPEAT:
 				case GLFW_PRESS: 
 				{
 					MouseButtonPressedEvent mouseButtonPressed(button);
@@ -105,7 +106,6 @@ namespace Spirit
 					data.EventCallback(mouseButtonReleased);
 					break;
 				}
-				case GLFW_REPEAT: break; // Not supported.
 			}
 		});
 

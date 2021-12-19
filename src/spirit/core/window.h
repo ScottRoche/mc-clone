@@ -34,6 +34,8 @@ namespace Spirit
 
 		void SetEventCallback(const EventCallbackFn& callback) { m_Data.EventCallback = callback; }
 
+		GLFWwindow& GetNativeWindow() { return *m_Window; }
+
 	private:
 		GLFWwindow* m_Window;
 		WindowProps m_Data;
