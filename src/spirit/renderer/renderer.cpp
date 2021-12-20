@@ -89,7 +89,7 @@ namespace Spirit
 		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(camera.GetProjection()));
 
 		int viewLoc = glGetUniformLocation(s_Data.RendererShader->GetShaderId(), "view");
-		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(camera.GetView()));
+		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(camera.GetViewMatrix()));
 	}
 
 	void Renderer::EndScene()

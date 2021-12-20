@@ -1,17 +1,14 @@
 #include "application.h"
 
-#include <functional>
+#include "log.h"
+#include "input.h"
+#include "key_codes.h"
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+#include "renderer/renderer.h"
 
 #include<glm.hpp>
 #include<gtc/matrix_transform.hpp>
 
-#include "log.h"
-#include "input.h"
-
-#include "renderer/renderer.h"
 
 namespace Spirit
 {
@@ -87,6 +84,11 @@ namespace Spirit
 
 		Camera camera(45.0f, glm::vec2(800.0f, 600.0f), 0.1f, 100.0f);
 		glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
+		camera.SetPosition(position);
+		float cameraSpeed = 1.0f;
+
+		float lastMouseX = 400.0f;
+		float lastMouseY = 300.0f;
 
 		while(s_IsRunning)
 		{
@@ -99,27 +101,35 @@ namespace Spirit
 
 			if (Input::IsKeyPressed(KeyCode::W))
 			{
-				position = glm::vec3(0.0f, 0.0f, 1.0f) * deltaTime;
+				position += camera.GetForwardVector() * (cameraSpeed * deltaTime);
 				camera.SetPosition(position);
 			}
 			
 			if (Input::IsKeyPressed(KeyCode::S))
 			{
-				position = glm::vec3(0.0f, 0.0f, -1.0f) * deltaTime;
+				position -= camera.GetForwardVector() * (cameraSpeed * deltaTime);
 				camera.SetPosition(position);
 			}
 
 			if (Input::IsKeyPressed(KeyCode::D))
 			{
-				position = glm::vec3(-1.0f, 0.0f, 0.0f) * deltaTime;
+				position += camera.GetRightVector() * (cameraSpeed * deltaTime);
 				camera.SetPosition(position);
 			}
 
 			if (Input::IsKeyPressed(KeyCode::A))
 			{
-				position = glm::vec3(1.0f, 0.0f, 0.0f) * deltaTime;
+				position -= camera.GetRightVector() * (cameraSpeed * deltaTime);
 				camera.SetPosition(position);
 			}
+
+			auto[mouseX, mouseY] = Input::GetMousePos();
+			LOG_DEBUG("{:f}, {:f}", (float)mouseX, (float)mouseY);
+
+			camera.AddYaw(((float)mouseX - lastMouseX) * 0.1f);
+			camera.AddPitch((lastMouseY - (float)mouseY) * 0.1f);
+			lastMouseX = (float)mouseX;
+			lastMouseY = (float)mouseY;
 
 			Renderer::BeginScene(camera);
 			Renderer::Submit(s_SampleVerts, sizeof(s_SampleVerts));
@@ -131,7 +141,7 @@ namespace Spirit
 
 	void Application::OnWindowResize(WindowResizeEvent& e)
 	{
-		glViewport(0, 0, e.GetWidth(), e.GetHeight());
+		Renderer::SetViewportSize(e.GetWidth(), e.GetHeight());
 	}
 
 	void Application::OnWindowClose(WindowCloseEvent& e)

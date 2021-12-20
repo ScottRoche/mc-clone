@@ -1,16 +1,10 @@
 #pragma once
 
 #include "event.h"
+#include "core/mouse_codes.h"
 
 namespace Spirit
 {
-	enum class MouseButton
-	{
-		Left = 0,
-		Right,
-		Middle
-	};
-
 	class MouseMovedEvent : public Event
 	{
 	public:
