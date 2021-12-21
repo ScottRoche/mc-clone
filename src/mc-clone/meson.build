@@ -1,1 +1,1 @@
-clone_source = files('mc_clone.cpp')
+clone_source = files('mc_clone.cpp', 'example_object.cpp')

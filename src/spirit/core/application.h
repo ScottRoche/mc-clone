@@ -4,6 +4,7 @@
 
 #include "window.h"
 #include "window_events.h"
+#include "object_stack.h"
 
 namespace Spirit
 {
@@ -11,13 +12,16 @@ namespace Spirit
 	{
 	public:
 		Application();
-		virtual ~Application() = default;
+		virtual ~Application();
 
 		static Application& Get() { return *s_Instance; }
 		Window& GetWindow() { return *m_Window; }
 
 		void OnEvent(Event& e);
 		void Run();
+
+	protected:
+		ObjectStack m_ObjectStack;
 
 	private:
 		void OnWindowResize(WindowResizeEvent& e);
