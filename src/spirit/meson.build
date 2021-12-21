@@ -12,11 +12,15 @@ spirit_source = ['main.cpp']
 spirit_source += core_source
 spirit_source += renderer_source
 
-spirit_includes = include_directories('event')
+spirit_includes = include_directories('.')
+event_includes = include_directories('event')
 
 spirit_lib = library('spirit',
                      spirit_source,
                      dependencies : spirit_dependencies,
-                     include_directories : spirit_includes)
+                     include_directories : event_includes,
+                     cpp_pch : 'engine/sprtpch.h')
 
-spirit_dep = declare_dependency(link_with : spirit_lib)
+spirit_dep = declare_dependency(link_with : spirit_lib,
+                                dependencies : spirit_dependencies,
+                                include_directories : [spirit_includes, event_includes])

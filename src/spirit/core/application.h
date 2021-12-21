@@ -11,7 +11,7 @@ namespace Spirit
 	{
 	public:
 		Application();
-		~Application();
+		virtual ~Application() = default;
 
 		static Application& Get() { return *s_Instance; }
 		Window& GetWindow() { return *m_Window; }
@@ -27,4 +27,7 @@ namespace Spirit
 		static Application* s_Instance;
 		std::unique_ptr<Window> m_Window;
 	};
+
+	// To be defined in CLIENT
+	Application* CreateApplication();
 }

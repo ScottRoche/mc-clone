@@ -1,5 +1,9 @@
 project('mc-clone', 'cpp')
 
 subdir('src/spirit')
+subdir('src/mc-clone')
 
-executable('mc-clone', link_with : spirit_lib)
+source = []
+source += clone_source
+
+executable('mc-clone', source, dependencies : spirit_dep)

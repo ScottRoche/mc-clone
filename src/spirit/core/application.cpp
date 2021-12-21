@@ -65,11 +65,6 @@ namespace Spirit
 		m_Window->SetEventCallback(SPRT_BIND_FN(Application::OnEvent));
 	}
 
-	Application::~Application()
-	{
-		
-	}
-
 	void Application::OnEvent(Event& e)
 	{
 		EventDispatcher dispatcher(e);
