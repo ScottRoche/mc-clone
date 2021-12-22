@@ -26,9 +26,11 @@ namespace Spirit
 
 	struct RendererData
 	{
-		static const unsigned int MaxVerts = 1024;
+		static const unsigned int CubeCount = 256 * (10 * 10);
+		static const unsigned int MaxVerts = 24 * CubeCount;
+		static const unsigned int MaxIndicies = 36 * CubeCount;
 
-		unsigned int VertexCount = 0;
+		unsigned int IndexCount = 0;
 
 		VertexArray* RendererVertexArray;
 		VertexBuffer* RendererVertexBuffer;
@@ -36,9 +38,6 @@ namespace Spirit
 		IndexBuffer* RendererIndicies;
 		std::vector<VertexData> RendererVertexData; // Vertex Data
 	};
-
-	static float windowWidth = 800.0f;  // Only doing this temporarily I know the size
-	static float windowHeight = 600.0f; // Only doing this temporarily I know the size
 
 	static RendererData s_Data;
 
@@ -56,8 +55,8 @@ namespace Spirit
 		s_Data.RendererVertexArray->AddVertexBuffer(s_Data.RendererVertexBuffer);
 
 		uint32_t offset = 0;
-		unsigned int indicies[s_Data.MaxVerts * 6];
-		for (unsigned int i = 0; i < s_Data.MaxVerts; i += 6)
+		unsigned int indicies[s_Data.MaxIndicies];
+		for (unsigned int i = 0; i < s_Data.MaxIndicies; i += 6)
 		{
 			indicies[i + 0] = offset + 0;
 			indicies[i + 1] = offset + 1;
@@ -69,7 +68,7 @@ namespace Spirit
 
 			offset += 4;
 		}
-		s_Data.RendererIndicies = new IndexBuffer(sizeof(VertexData) * s_Data.MaxVerts, indicies);
+		s_Data.RendererIndicies = new IndexBuffer(s_Data.MaxIndicies * sizeof(unsigned int), indicies);
 
 		s_Data.RendererShader = new Shader("./shaders/Cube_VP.glsl", "./shaders/Cube_FP.glsl");
 	}
@@ -97,12 +96,18 @@ namespace Spirit
 
 	void Renderer::Submit(float* meshData, uint32_t dataSize)
 	{
+		static int sub_count = 0;
 		VertexData vertexData;
 
-		if (s_Data.VertexCount + (dataSize / sizeof(VertexData)) >= s_Data.MaxVerts)
+		if (s_Data.IndexCount >= s_Data.MaxIndicies)
 		{
-			LOG_WARN("Premature Flushing");
+			LOG_WARN("Premature Flushing ({:d}B)", sub_count);
 			Flush();
+			sub_count = 1;
+		}
+		else
+		{
+			sub_count++;
 		}
 
 		for (uint32_t i = 0; i < dataSize / sizeof(float); i += 6)
@@ -118,7 +123,7 @@ namespace Spirit
 			s_Data.RendererVertexData.push_back(vertexData);
 		}
 
-		s_Data.VertexCount += dataSize / sizeof(VertexData);
+		s_Data.IndexCount += 36;
 	}
 
 	void Renderer::SetViewportSize(uint32_t width, uint32_t height)
@@ -134,15 +139,16 @@ namespace Spirit
 
 		s_Data.RendererVertexData.clear();
 		s_Data.RendererVertexBuffer->Reset();
-		s_Data.VertexCount = 0;
+		s_Data.IndexCount = 0;
 	}
 
 	void Renderer::Draw()
 	{
 		s_Data.RendererShader->Bind();
 		s_Data.RendererVertexArray->Bind();
+		s_Data.RendererIndicies->Bind();
 
-		glDrawElements(GL_TRIANGLES, s_Data.MaxVerts, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, s_Data.MaxIndicies, GL_UNSIGNED_INT, 0);
 	}
 
 }
