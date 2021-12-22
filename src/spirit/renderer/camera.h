@@ -17,6 +17,7 @@ namespace Spirit
 		glm::mat4 GetProjection() const { return m_Projection; }
 		glm::mat4 GetViewMatrix() const;
 
+		const glm::vec3& GetPosition() { return m_Position; }
 		const glm::vec3& GetForwardVector() { return m_ForwardVector; }
 		const glm::vec3& GetUpVector() { return m_UpVector; }
 		const glm::vec3& GetRightVector() { return m_RightVector; }

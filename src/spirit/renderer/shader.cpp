@@ -7,8 +7,16 @@
 
 #include "core/log.h"
 
+#include <gtc/type_ptr.hpp>
+
 namespace Spirit
 {
+	void Shader::SetUniformMatrix4fv(const std::string& name, glm::mat4 value)
+	{
+		int location = glGetUniformLocation(m_ShaderId, name.c_str());
+		glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
+	}
+
 	Shader::Shader(const std::string& vertexPath, const std::string& fragmentPath)
 		: m_VertexPath(vertexPath), m_FragmentPath(fragmentPath)
 	{

@@ -1,28 +1,28 @@
-#include "object_stack.h"
+#include "layer_stack.h"
 
 namespace Spirit
 {
-	ObjectStack::~ObjectStack()
+	LayerStack::~LayerStack()
 	{
 		for (auto object : m_Objects)
 		{
-			object->OnEnd();
+			object->OnDetach();
 			delete object;
 		}
 	}
 
-	void ObjectStack::PushObject(Object* object)
+	void LayerStack::PushObject(Layer* object)
 	{
 		m_Objects.emplace_back(object);
-		object->OnBegin();
+		object->OnAttach();
 	}
 
-	void ObjectStack::PopObject(Object* object)
+	void LayerStack::PopObject(Layer* object)
 	{
 		auto itr = std::find(m_Objects.begin(), m_Objects.end(), object);
 		if (itr != m_Objects.end())
 		{
-			object->OnEnd();
+			object->OnDetach();
 			m_Objects.erase(itr);
 		}
 	}

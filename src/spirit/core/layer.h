@@ -5,21 +5,23 @@
 namespace Spirit
 {
 	/* The lowest level class for an object within the engine */
-	class Object
+	class Layer
 	{
 	public:
-		Object(const std::string& name = "Default Object");
-		virtual ~Object() = default;
+		Layer(const std::string& name = "Default Object");
+		virtual ~Layer();
 
-		virtual void OnBegin() {}
-		virtual void OnEnd() {}
+		virtual void OnAttach() {}
+		virtual void OnDetach() {}
+
 		virtual void OnUpdate(float deltaTime) {}
 		virtual void OnEvent() {}
+
 		virtual const std::string& ToString() {}
 
-		const std::string& GetName() { return m_Name; }
+		inline const std::string& GetName() { return m_DebugName; }
 
 	protected:
-		std::string m_Name;
+		std::string m_DebugName;
 	};
 }

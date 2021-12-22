@@ -4,7 +4,7 @@
 
 #include "window.h"
 #include "window_events.h"
-#include "object_stack.h"
+#include "layer_stack.h"
 
 namespace Spirit
 {
@@ -21,7 +21,7 @@ namespace Spirit
 		void Run();
 
 	protected:
-		ObjectStack m_ObjectStack;
+		LayerStack m_ObjectStack;
 
 	private:
 		void OnWindowResize(WindowResizeEvent& e);

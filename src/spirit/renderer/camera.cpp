@@ -25,9 +25,9 @@ namespace Spirit
 
 	glm::mat4 Camera::GetViewMatrix() const
 	{
-		LOG_DEBUG("Position: {:f}, {:f}, {:f} Rotation: {:f}, {:f}, {:f}",
-		          m_Position.x, m_Position.y, m_Position.z,
-		          m_Rotation.x, m_Rotation.y, m_Rotation.z);
+		// LOG_DEBUG("Position: {:f}, {:f}, {:f} Rotation: {:f}, {:f}, {:f}",
+		//           m_Position.x, m_Position.y, m_Position.z,
+		//           m_Rotation.x, m_Rotation.y, m_Rotation.z);
 		return glm::lookAt(m_Position, m_Position + m_ForwardVector, glm::vec3(0.0f, 1.0f, 0.0f));
 	}
 

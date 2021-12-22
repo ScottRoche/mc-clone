@@ -8,7 +8,7 @@
 
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
-#include <gtc/type_ptr.hpp>
+
 
 #include "core/log.h"
 
@@ -47,7 +47,7 @@ namespace Spirit
 		s_Data.RendererVertexArray = new VertexArray();
 		s_Data.RendererVertexArray->Bind();
 
-		s_Data.RendererVertexBuffer = new VertexBuffer(sizeof(float) * s_Data.MaxVerts);
+		s_Data.RendererVertexBuffer = new VertexBuffer(sizeof(VertexData) * s_Data.MaxVerts);
 		s_Data.RendererVertexBuffer->SetLayout({
 			{3, ElementType::Float, false, (void*)0},
 			{3, ElementType::Float, false, (void*)(3 * 4)}
@@ -69,9 +69,9 @@ namespace Spirit
 
 			offset += 4;
 		}
-		s_Data.RendererIndicies = new IndexBuffer((sizeof(float) * s_Data.MaxVerts) * 6, indicies);
+		s_Data.RendererIndicies = new IndexBuffer(sizeof(VertexData) * s_Data.MaxVerts, indicies);
 
-		s_Data.RendererShader = new Shader("./shaders/vertex.glsl", "./shaders/fragment.glsl");
+		s_Data.RendererShader = new Shader("./shaders/Cube_VP.glsl", "./shaders/Cube_FP.glsl");
 	}
 
 	void Renderer::Deinit()
@@ -85,15 +85,13 @@ namespace Spirit
 	{
 		s_Data.RendererShader->Bind();
 
-		int projLoc = glGetUniformLocation(s_Data.RendererShader->GetShaderId(), "proj");
-		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(camera.GetProjection()));
-
-		int viewLoc = glGetUniformLocation(s_Data.RendererShader->GetShaderId(), "view");
-		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(camera.GetViewMatrix()));
+		s_Data.RendererShader->SetUniformMatrix4fv("proj", camera.GetProjection());
+		s_Data.RendererShader->SetUniformMatrix4fv("view", camera.GetViewMatrix());
 	}
 
 	void Renderer::EndScene()
 	{
+		LOG_WARN("Standard Flushing");
 		Flush();
 	}
 
@@ -101,8 +99,9 @@ namespace Spirit
 	{
 		VertexData vertexData;
 
-		if (s_Data.VertexCount + dataSize / (sizeof(float) * 6) >= s_Data.MaxVerts)
+		if (s_Data.VertexCount + (dataSize / sizeof(VertexData)) >= s_Data.MaxVerts)
 		{
+			LOG_WARN("Premature Flushing");
 			Flush();
 		}
 
@@ -119,7 +118,7 @@ namespace Spirit
 			s_Data.RendererVertexData.push_back(vertexData);
 		}
 
-		s_Data.VertexCount += dataSize / (sizeof(float) * 6);
+		s_Data.VertexCount += dataSize / sizeof(VertexData);
 	}
 
 	void Renderer::SetViewportSize(uint32_t width, uint32_t height)
@@ -130,26 +129,16 @@ namespace Spirit
 	void Renderer::Flush()
 	{
 		s_Data.RendererVertexBuffer->AddData((float*)s_Data.RendererVertexData.data(),
-		                                     s_Data.RendererVertexData.size() * (sizeof(float) * 6));
+		                                     s_Data.RendererVertexData.size() * sizeof(VertexData));
 		Draw();
 
 		s_Data.RendererVertexData.clear();
+		s_Data.RendererVertexBuffer->Reset();
 		s_Data.VertexCount = 0;
 	}
 
 	void Renderer::Draw()
 	{
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glEnable(GL_DEPTH_TEST);
-
-		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::rotate(model,
-		                    (float)glfwGetTime() * glm::radians(-20.0f),
-		                    glm::vec3(1.0f, 1.0f, 0.0f));
-
-		int modelLoc = glGetUniformLocation(s_Data.RendererShader->GetShaderId(), "model");
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-
 		s_Data.RendererShader->Bind();
 		s_Data.RendererVertexArray->Bind();
 

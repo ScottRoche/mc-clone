@@ -12,44 +12,6 @@
 
 namespace Spirit
 {
-	static float s_SampleVerts[] = {
-		// Front
-		-0.5f,  0.5f,  0.5f, 1.0f, 0.0f, 0.0f, // top-left
-		-0.5f, -0.5f,  0.5f, 1.0f, 0.0f, 0.0f, // bottom-left
-		0.5f, -0.5f,  0.5f, 1.0f, 0.0f, 0.0f, // bottom-right
-		0.5f,  0.5f,  0.5f, 1.0f, 0.0f, 0.0f, // top-right
-		
-		// Back
-		-0.5f,  0.5f, -0.5f, 1.0f, 0.0f, 0.0f, // top-left
-		-0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, // bottom-left
-		0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, // bottom-right
-		0.5f,  0.5f, -0.5f, 1.0f, 0.0f, 0.0f, // top-right
-
-		// Left
-		-0.5f,  0.5f,  0.5f, 0.0f, 1.0f, 0.0f, // front-top
-		-0.5f, -0.5f,  0.5f, 0.0f, 1.0f, 0.0f, // bottom-front
-		-0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, // bottom-back
-		-0.5f,  0.5f, -0.5f, 0.0f, 1.0f, 0.0f, // top-right
-
-		// Right
-		0.5f,  0.5f,  0.5f, 0.0f, 1.0f, 0.0f, // front-top
-		0.5f, -0.5f,  0.5f, 0.0f, 1.0f, 0.0f, // bottom-front
-		0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, // bottom-back
-		0.5f,  0.5f, -0.5f, 0.0f, 1.0f, 0.0f, // top-right
-
-		// Top
-		-0.5f,  0.5f,  0.5f, 0.0f, 0.0f, 1.0f, // front-top
-		0.5f,  0.5f,  0.5f, 0.0f, 0.0f, 1.0f, // bottom-front
-		0.5f,  0.5f, -0.5f, 0.0f, 0.0f, 1.0f, // bottom-back
-		-0.5f,  0.5f, -0.5f, 0.0f, 0.0f, 1.0f, // top-right
-
-		// Bottom
-		-0.5f, -0.5f,  0.5f, 0.0f, 0.0f, 1.0f, // front-top
-		0.5f, -0.5f,  0.5f, 0.0f, 0.0f, 1.0f, // bottom-front
-		0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, // bottom-back
-		-0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, // top-right
-	};
-
 	Application* Application::s_Instance = nullptr;
 	bool s_IsRunning = true;
 
@@ -82,14 +44,6 @@ namespace Spirit
 
 	void Application::Run()
 	{
-		// Camera camera(45.0f, glm::vec2(800.0f, 600.0f), 0.1f, 100.0f);
-		// glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
-		// camera.SetPosition(position);
-		// float cameraSpeed = 1.0f;
-
-		// float lastMouseX = 400.0f;
-		// float lastMouseY = 300.0f;
-
 		while(s_IsRunning)
 		{
 			static float lastFrame = 0.0f;
@@ -97,52 +51,16 @@ namespace Spirit
 			float deltaTime = ts - lastFrame;
 			lastFrame = ts;
 
-			for (Object *object : m_ObjectStack)
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			glEnable(GL_DEPTH_TEST);
+
+			for (Layer *object : m_ObjectStack)
 			{
 				object->OnUpdate(deltaTime);
 			}
 
 			m_Window->OnUpdate();
 		}
-
-		// 	if (Input::IsKeyPressed(KeyCode::W))
-		// 	{
-		// 		position += camera.GetForwardVector() * (cameraSpeed * deltaTime);
-		// 		camera.SetPosition(position);
-		// 	}
-			
-		// 	if (Input::IsKeyPressed(KeyCode::S))
-		// 	{
-		// 		position -= camera.GetForwardVector() * (cameraSpeed * deltaTime);
-		// 		camera.SetPosition(position);
-		// 	}
-
-		// 	if (Input::IsKeyPressed(KeyCode::D))
-		// 	{
-		// 		position += camera.GetRightVector() * (cameraSpeed * deltaTime);
-		// 		camera.SetPosition(position);
-		// 	}
-
-		// 	if (Input::IsKeyPressed(KeyCode::A))
-		// 	{
-		// 		position -= camera.GetRightVector() * (cameraSpeed * deltaTime);
-		// 		camera.SetPosition(position);
-		// 	}
-
-		// 	auto[mouseX, mouseY] = Input::GetMousePos();
-		// 	LOG_DEBUG("{:f}, {:f}", (float)mouseX, (float)mouseY);
-
-		// 	camera.AddYaw(((float)mouseX - lastMouseX) * 0.1f);
-		// 	camera.AddPitch((lastMouseY - (float)mouseY) * 0.1f);
-		// 	lastMouseX = (float)mouseX;
-		// 	lastMouseY = (float)mouseY;
-
-		// 	Renderer::BeginScene(camera);
-		// 	Renderer::Submit(s_SampleVerts, sizeof(s_SampleVerts));
-		// 	Renderer::EndScene();
-		// }
-
-		// Renderer::Deinit();
 	}
 
 	void Application::OnWindowResize(WindowResizeEvent& e)

@@ -2,6 +2,8 @@
 
 #include <string>
 
+#include "glm.hpp"
+
 namespace Spirit
 {
 	class Shader
@@ -11,6 +13,8 @@ namespace Spirit
 
 		void Bind();
 		void Unbind();
+
+		void SetUniformMatrix4fv(const std::string& name, glm::mat4 value);
 
 		unsigned int GetShaderId() const { return m_ShaderId; }
 

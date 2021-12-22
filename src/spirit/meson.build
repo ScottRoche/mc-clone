@@ -8,7 +8,7 @@ spirit_dependencies = [glfw, glad, spdlog, glm]
 subdir('core')
 subdir('renderer')
 
-spirit_source = ['main.cpp']
+spirit_source = []
 spirit_source += core_source
 spirit_source += renderer_source
 
