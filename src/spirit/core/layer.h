@@ -2,6 +2,8 @@
 
 #include "engine/sprtpch.h"
 
+#include "event.h"
+
 namespace Spirit
 {
 	/* The lowest level class for an object within the engine */
@@ -15,7 +17,7 @@ namespace Spirit
 		virtual void OnDetach() {}
 
 		virtual void OnUpdate(float deltaTime) {}
-		virtual void OnEvent() {}
+		virtual void OnEvent(Event& event) {}
 
 		virtual const std::string& ToString() {}
 

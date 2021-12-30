@@ -9,6 +9,11 @@ public:
 	virtual void OnDetach() override;
 
 	virtual void OnUpdate(float deltaTime) override;
+	virtual void OnEvent(Spirit::Event& event) override;
+
+private:
+	void SetDrawMode(Spirit::KeyPressedEvent& event);
+
 private:
 
 	std::shared_ptr<Spirit::CameraController> m_CameraController;

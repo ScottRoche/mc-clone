@@ -21,7 +21,7 @@ namespace Spirit
 		void Run();
 
 	protected:
-		LayerStack m_ObjectStack;
+		LayerStack m_LayerStack;
 
 	private:
 		void OnWindowResize(WindowResizeEvent& e);

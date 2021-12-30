@@ -9,18 +9,18 @@ public:
 	MCClone()
 	{
 		LOG_WARN("MC_CLONE Started");
-		obj = new ExampleLayer();
-		m_ObjectStack.PushObject(obj);
+		layer = new ExampleLayer();
+		m_LayerStack.PushObject(layer);
 	}
 
 	~MCClone() override
 	{
-		m_ObjectStack.PopObject(obj);
-		delete obj;
+		m_LayerStack.PopObject(layer);
+		delete layer;
 		LOG_WARN("MC_CLONE Closed");
 	}
 
-ExampleLayer* obj;
+ExampleLayer* layer;
 
 };
 

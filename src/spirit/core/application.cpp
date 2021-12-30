@@ -3,6 +3,7 @@
 #include "log.h"
 #include "input.h"
 #include "key_codes.h"
+#include "base.h"
 
 #include "renderer/renderer.h"
 
@@ -14,8 +15,6 @@ namespace Spirit
 {
 	Application* Application::s_Instance = nullptr;
 	bool s_IsRunning = true;
-
-	#define SPRT_BIND_FN(fn) [this](auto&&... args) -> decltype(auto) { return this->fn(std::forward<decltype(args)>(args)...); }
 
 	Application::Application()
 	{
@@ -40,6 +39,11 @@ namespace Spirit
 
 		dispatcher.Dispatch<Spirit::WindowResizeEvent>(SPRT_BIND_FN(Application::OnWindowResize));
 		dispatcher.Dispatch<Spirit::WindowCloseEvent>(SPRT_BIND_FN(Application::OnWindowClose));
+
+		for (Layer *layer : m_LayerStack)
+		{
+			layer->OnEvent(e);
+		}
 	}
 
 	void Application::Run()
@@ -54,9 +58,9 @@ namespace Spirit
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			glEnable(GL_DEPTH_TEST);
 
-			for (Layer *object : m_ObjectStack)
+			for (Layer *layer : m_LayerStack)
 			{
-				object->OnUpdate(deltaTime);
+				layer->OnUpdate(deltaTime);
 			}
 
 			m_Window->OnUpdate();
