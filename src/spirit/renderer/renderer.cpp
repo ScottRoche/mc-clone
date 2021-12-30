@@ -15,6 +15,7 @@
 #include "buffer.h"
 #include "shader.h"
 #include "vertex_array.h"
+#include "texture.h"
 
 namespace Spirit
 {
@@ -22,13 +23,15 @@ namespace Spirit
 	{
 		glm::vec3 Transform;
 		glm::vec3 Color;
+		glm::vec2 TexCoords;
+		float TexIndex;
 	};
 
 	struct RendererData
 	{
-		static const unsigned int CubeCount = 256 * (10 * 10);
-		static const unsigned int MaxVerts = 24 * CubeCount;
-		static const unsigned int MaxIndicies = 36 * CubeCount;
+		static const unsigned int QuadCount = 20000;
+		static const unsigned int MaxVerts = QuadCount * 4;
+		static const unsigned int MaxIndicies = QuadCount * 6;
 
 		unsigned int IndexCount = 0;
 
@@ -36,10 +39,16 @@ namespace Spirit
 		VertexBuffer* RendererVertexBuffer;
 		Shader* RendererShader;
 		IndexBuffer* RendererIndicies;
-		std::vector<VertexData> RendererVertexData; // Vertex Data
+		std::vector<VertexData> RendererVertexData;
+
+		std::shared_ptr<Texture> BottomTexture;
+		std::shared_ptr<Texture> SidesTexture;
+		std::shared_ptr<Texture> TopTexture;
 	};
 
 	static RendererData s_Data;
+
+	uint32_t indicies[s_Data.MaxIndicies];
 
 	void Renderer::Init()
 	{
@@ -49,13 +58,14 @@ namespace Spirit
 		s_Data.RendererVertexBuffer = new VertexBuffer(sizeof(VertexData) * s_Data.MaxVerts);
 		s_Data.RendererVertexBuffer->SetLayout({
 			{3, ElementType::Float, false, (void*)0},
-			{3, ElementType::Float, false, (void*)(3 * 4)}
+			{3, ElementType::Float, false, (void*)(3 * 4)},
+			{2, ElementType::Float, false, (void*)(6 * 4)},
+			{1, ElementType::Float, false, (void*)(8 * 4)}
 		});
 
 		s_Data.RendererVertexArray->AddVertexBuffer(s_Data.RendererVertexBuffer);
 
 		uint32_t offset = 0;
-		unsigned int indicies[s_Data.MaxIndicies];
 		for (unsigned int i = 0; i < s_Data.MaxIndicies; i += 6)
 		{
 			indicies[i + 0] = offset + 0;
@@ -68,9 +78,19 @@ namespace Spirit
 
 			offset += 4;
 		}
-		s_Data.RendererIndicies = new IndexBuffer(s_Data.MaxIndicies * sizeof(unsigned int), indicies);
+		s_Data.RendererIndicies = new IndexBuffer(indicies, s_Data.MaxIndicies);
 
 		s_Data.RendererShader = new Shader("./shaders/Cube_VP.glsl", "./shaders/Cube_FP.glsl");
+		s_Data.RendererShader->SetUniformSampler2D("texture0", 0);
+		s_Data.RendererShader->SetUniformSampler2D("texture1", 1);
+		s_Data.RendererShader->SetUniformSampler2D("texture2", 2);
+
+		glActiveTexture(GL_TEXTURE0);
+		s_Data.BottomTexture = std::make_shared<Texture>("./assets/dirt.jpg");
+		glActiveTexture(GL_TEXTURE1);
+		s_Data.SidesTexture = std::make_shared<Texture>("./assets/grass_side.jpg");
+		glActiveTexture(GL_TEXTURE2);
+		s_Data.TopTexture = std::make_shared<Texture>("./assets/grass.jpg");
 	}
 
 	void Renderer::Deinit()
@@ -90,7 +110,7 @@ namespace Spirit
 
 	void Renderer::EndScene()
 	{
-		LOG_WARN("Standard Flushing");
+		//LOG_WARN("Standard Flushing");
 		Flush();
 	}
 
@@ -101,16 +121,11 @@ namespace Spirit
 
 		if (s_Data.IndexCount >= s_Data.MaxIndicies)
 		{
-			LOG_WARN("Premature Flushing ({:d}B)", sub_count);
+			// LOG_DEBUG("Premature Flushing ({:d})", s_Data.RendererVertexData.size());
 			Flush();
-			sub_count = 1;
-		}
-		else
-		{
-			sub_count++;
 		}
 
-		for (uint32_t i = 0; i < dataSize / sizeof(float); i += 6)
+		for (uint32_t i = 0; i < dataSize / sizeof(float); i += sizeof(VertexData) / sizeof(float))
 		{
 			vertexData.Transform = glm::vec3(meshData[i],
 			                                 meshData[i + 1],
@@ -119,11 +134,16 @@ namespace Spirit
 			vertexData.Color = glm::vec3(meshData[i + 3],
 			                             meshData[i + 4],
 			                             meshData[i + 5]);
+			
+			vertexData.TexCoords = glm::vec2(meshData[i + 6],
+			                                 meshData[i + 7]);
+			
+			vertexData.TexIndex = meshData[i + 8];
 
 			s_Data.RendererVertexData.push_back(vertexData);
 		}
 
-		s_Data.IndexCount += 36;
+		s_Data.IndexCount += 36; /* I only know this because all I'm drawing right now is cubes */
 	}
 
 	void Renderer::SetViewportSize(uint32_t width, uint32_t height)
@@ -145,8 +165,8 @@ namespace Spirit
 	void Renderer::Draw()
 	{
 		s_Data.RendererShader->Bind();
-		s_Data.RendererVertexArray->Bind();
 		s_Data.RendererIndicies->Bind();
+		s_Data.RendererVertexArray->Bind();
 
 		glDrawElements(GL_TRIANGLES, s_Data.MaxIndicies, GL_UNSIGNED_INT, 0);
 	}

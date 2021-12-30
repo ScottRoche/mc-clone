@@ -67,7 +67,7 @@ namespace Spirit
 	void VertexBuffer::AddData(float* vertexData, uint32_t size)
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, m_BufferId);
-		glBufferSubData(GL_ARRAY_BUFFER, m_BufferEnd, size, vertexData);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, size, vertexData);
 		m_BufferEnd += size;
 	}
 
@@ -75,11 +75,11 @@ namespace Spirit
  * Index Buffer
 *****************************************************************************/
 
-	IndexBuffer::IndexBuffer(uint32_t size, uint32_t* indicies)
+	IndexBuffer::IndexBuffer(uint32_t* indicies, uint32_t size)
 	{
 		glGenBuffers(1, &m_BufferId);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_BufferId);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, indicies, GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, size * sizeof(uint32_t), indicies, GL_STATIC_DRAW);
 	}
 
 	IndexBuffer::~IndexBuffer()

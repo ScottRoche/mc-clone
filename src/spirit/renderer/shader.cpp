@@ -17,6 +17,12 @@ namespace Spirit
 		glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
 	}
 
+	void Shader::SetUniformSampler2D(const std::string& name, unsigned int value)
+	{
+		int location = glGetUniformLocation(m_ShaderId, name.c_str());
+		glUniform1i(location, value);
+	}
+
 	Shader::Shader(const std::string& vertexPath, const std::string& fragmentPath)
 		: m_VertexPath(vertexPath), m_FragmentPath(fragmentPath)
 	{

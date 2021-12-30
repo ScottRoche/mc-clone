@@ -19,7 +19,7 @@ namespace Spirit
 	{
 		static float lastMouseX = 400, lastMouseY = 300;
 
-		float cameraSpeed = 1.0f;
+		float cameraSpeed = 5.0f;
 
 		if (Input::IsKeyPressed(KeyCode::W))
 		{
@@ -46,7 +46,6 @@ namespace Spirit
 		}
 
 		auto[mouseX, mouseY] = Input::GetMousePos();
-		LOG_DEBUG("{:f}, {:f}", (float)mouseX, (float)mouseY);
 
 		m_Camera->AddYaw(((float)mouseX - lastMouseX) * 0.1f);
 		m_Camera->AddPitch((lastMouseY - (float)mouseY) * 0.1f);

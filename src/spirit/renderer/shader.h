@@ -15,6 +15,7 @@ namespace Spirit
 		void Unbind();
 
 		void SetUniformMatrix4fv(const std::string& name, glm::mat4 value);
+		void SetUniformSampler2D(const std::string& name, unsigned int value);
 
 		unsigned int GetShaderId() const { return m_ShaderId; }
 

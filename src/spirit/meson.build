@@ -2,8 +2,9 @@ glfw = dependency('glfw3')
 glad = subproject('glad').get_variable('glad_dep')
 spdlog = subproject('spdlog').get_variable('spdlog_dep')
 glm = subproject('glm').get_variable('glm_dep')
+stbi = subproject('stb_image').get_variable('stbi_dep')
 
-spirit_dependencies = [glfw, glad, spdlog, glm]
+spirit_dependencies = [glfw, glad, spdlog, glm, stbi]
 
 subdir('core')
 subdir('renderer')

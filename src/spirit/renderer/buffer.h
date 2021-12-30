@@ -70,7 +70,7 @@ namespace Spirit
 	class IndexBuffer
 	{
 	public:
-		IndexBuffer(uint32_t size, uint32_t* indicies);
+		IndexBuffer(uint32_t* indicies, uint32_t size);
 		~IndexBuffer();
 
 		void Bind();
