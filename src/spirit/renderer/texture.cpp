@@ -34,17 +34,19 @@ namespace Spirit
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, m_Width, m_Height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 
+		glBindTexture(GL_TEXTURE_2D, 0);
+
 		stbi_image_free(data);
 	}
 
 	Texture::~Texture()
 	{
-		glBindTexture(GL_TEXTURE_2D, m_TextureId);
 		glDeleteTextures(1, &m_TextureId);
 	}
 
-	void Texture::Bind()
+	void Texture::Bind(uint32_t slot)
 	{
+		glActiveTexture(GL_TEXTURE0 + slot);
 		glBindTexture(GL_TEXTURE_2D, m_TextureId);
 	}
 

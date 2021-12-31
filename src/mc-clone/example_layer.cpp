@@ -5,8 +5,6 @@
 
 #include "core/base.h"
 
-#include "renderer/texture.h"
-
 static float s_SampleVerts[] = {
 	// Front
 	-0.5f,  0.5f,  0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, // top-left
@@ -52,6 +50,14 @@ void ExampleLayer::OnAttach()
 	m_Camera = std::make_shared<Spirit::Camera>(45.0f, glm::vec2(800, 600), 0.1f, 4000.0f);
 	m_Camera->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 	m_CameraController = std::make_shared<Spirit::CameraController>(m_Camera);
+
+	m_BottomTexture = std::make_shared<Spirit::Texture>("./assets/dirt.jpg");
+	m_SidesTexture = std::make_shared<Spirit::Texture>("./assets/grass_side.jpg");
+	m_TopTexture = std::make_shared<Spirit::Texture>("./assets/grass.jpg");
+
+	m_BottomTexture->Bind();
+	m_SidesTexture->Bind(1);
+	m_TopTexture->Bind(2);
 }
 
 void ExampleLayer::OnDetach()

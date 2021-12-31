@@ -40,10 +40,6 @@ namespace Spirit
 		Shader* RendererShader;
 		IndexBuffer* RendererIndicies;
 		std::vector<VertexData> RendererVertexData;
-
-		std::shared_ptr<Texture> BottomTexture;
-		std::shared_ptr<Texture> SidesTexture;
-		std::shared_ptr<Texture> TopTexture;
 	};
 
 	static RendererData s_Data;
@@ -84,13 +80,6 @@ namespace Spirit
 		s_Data.RendererShader->SetUniformSampler2D("texture0", 0);
 		s_Data.RendererShader->SetUniformSampler2D("texture1", 1);
 		s_Data.RendererShader->SetUniformSampler2D("texture2", 2);
-
-		glActiveTexture(GL_TEXTURE0);
-		s_Data.BottomTexture = std::make_shared<Texture>("./assets/dirt.jpg");
-		glActiveTexture(GL_TEXTURE1);
-		s_Data.SidesTexture = std::make_shared<Texture>("./assets/grass_side.jpg");
-		glActiveTexture(GL_TEXTURE2);
-		s_Data.TopTexture = std::make_shared<Texture>("./assets/grass.jpg");
 	}
 
 	void Renderer::Deinit()
@@ -116,7 +105,6 @@ namespace Spirit
 
 	void Renderer::Submit(float* meshData, uint32_t dataSize)
 	{
-		static int sub_count = 0;
 		VertexData vertexData;
 
 		if (s_Data.IndexCount >= s_Data.MaxIndicies)

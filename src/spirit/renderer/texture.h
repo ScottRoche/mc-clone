@@ -13,7 +13,7 @@ namespace Spirit
 		inline uint32_t GetWidth() const { return m_Width; }
 		inline uint32_t GetHeight() const { return m_Height; }
 
-		void Bind();
+		void Bind(uint32_t slot = 0);
 		void Unbind();
 
 	private:
